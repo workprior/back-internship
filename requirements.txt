@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+
+
+black
+isort 
+flake8
+pre-commit
+
+
