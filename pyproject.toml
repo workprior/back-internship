@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "internship-backend"
+version = "0.1.0"
+description = "Fast API project"
+authors = ["workprior <lolprior.201@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.111.0"
+uvicorn = "^0.30.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^8.2.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
