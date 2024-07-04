@@ -1,13 +1,13 @@
-
 **/__pycache__/
 **/*.pyc
 **/*.pyo
+
+.vscode
+.venv/
+
+
 .pytest_cache
 
-
-.venv
-.env
-
-
 .black
-.vscode
+
+.git/
