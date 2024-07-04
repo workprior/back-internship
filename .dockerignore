@@ -1,0 +1,17 @@
+
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+.vscode
+.venv/
+.env
+.env.sample
+
+tests
+.pytest_cache
+
+.black
+
+.git/
+
