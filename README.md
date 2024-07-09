@@ -68,20 +68,36 @@ Check version
 ```bash
 docker -v
 ```
-#### 4.1 Build the Docker image
+#### 4.1 Build and run the Docker containers
 
-Run the command to build the Docker image(my-fastapi-poetry-app change it to your image name):
+Run the following command to build and start the Docker containers:
 
 ```bash
-docker build -t my-fastapi-poetry-app .
+docker-compose up --build
 
 ```
 
-#### 4.2 Create and Run Docker container
+#### 4.2 Access the FastAPI application
 
-my-fastapi-poetry-container - name of your container;
-my-fastapi-poetry-app - name of your image;
+Once the containers are up and running, you can access the FastAPI application at url:
 
 ```bash
-docker run --env-file .env.docker -d --name my-fastapi-poetry-container -p 8000:8000 my-fastapi-poetry-app
+http://localhost:8000
+```
+
+#### 4.3 Check database connections
+
+You can use the following endpoints to check the connections to PostgreSQL and Redis:
+
+Check PostgreSQL connection:
+
+```bash
+http://localhost:8000/check-postgres
+
+```
+
+Check Redis connection:
+
+```bash
+http://localhost:8000/check-redis
 ```

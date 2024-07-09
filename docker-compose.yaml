@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  fastapi_app:
+    container_name: fastapi_app
+    build: .
+    volumes:
+        - ./app:/myapp
+    ports:
+      - "${APP_PORT}:8000"
+    env_file:
+      - .env.docker
+    depends_on:
+      - postgres_db 
+      - redis_db
+
+  postgres_db:
+    container_name: postgres_db
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_DB_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+    ports:
+      - "${POSTGRES_DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis_db:
+    container_name: redis_db
+    image: redis:7.2
+    ports:
+      - "${REDIS_DB_PORT}:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
