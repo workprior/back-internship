@@ -1,9 +1,11 @@
 import redis.asyncio as redis
-from app.core.config import settings, logger
+
+from app.core.config import logger, settings
+
 
 class RedisClient:
     redis = None
-    url = ''
+    url = ""
     soket_timeout = 0
 
     def __init__(self, url, socket_timeout):
@@ -21,6 +23,3 @@ class RedisClient:
 
 
 redis_client = RedisClient(settings.REDIS_DATABASE_URL, 5)
-
-
-
