@@ -1,5 +1,5 @@
 import logging
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     POSTGRES_DB_USER : str
@@ -19,8 +19,10 @@ class Settings(BaseSettings):
     def REDIS_DATABASE_URL(self):
         return f"redis://{self.REDIS_DB_HOST}:{self.REDIS_DB_PORT}"
 
-    model_config = SettingsConfigDict(env_file='.env')
-
+  
+    class Config:
+        env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()
 

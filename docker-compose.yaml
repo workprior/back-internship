@@ -7,9 +7,9 @@ services:
     volumes:
         - ./app:/myapp
     ports:
-      - "${APP_PORT}:8000"
+      - "${EXTRA_APP_PORT}:8000"
     env_file:
-      - .env.docker
+      - .env
     depends_on:
       - postgres_db 
       - redis_db
