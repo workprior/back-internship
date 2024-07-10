@@ -1,27 +1,21 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from app.db.postgres_init import connect_to__postgres, disconnect_postgres
 from app.db.redis_init import redis_client
-from app.routers.db_routers import router
+from app.routers.check_routers import health_check
 
-# FastAPI app setup
-app = FastAPI()
-
-@app.on_event("startup")
-async def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # start app
     await connect_to__postgres()
     await redis_client.connect_redis()
 
-@app.on_event("shutdown")
-async def on_shutdown():
+    yield
+    # finish app
     await disconnect_postgres()
     await redis_client.disconnect_redis()
 
-@app.get("/")
-def root():
-    return {
-        "status": 200,
-        "details": "ok",
-        "result": "working"
-    }
+# FastAPI app setup
+app = FastAPI(lifespan=lifespan)
 
-app.include_router(router)
+app.include_router(health_check)
