@@ -52,4 +52,4 @@ async def check_redis():
 
 @health_check.get("/")
 def root():
-    return {"status": 200, "details": "ok", "result": "working"}
+    return {"status": 200, "details": "ok", "result": "now work?"}

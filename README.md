@@ -101,3 +101,27 @@ Check Redis connection:
 ```bash
 http://localhost:8000/check-redis
 ```
+
+
+### 4. Init migrations
+To create a new migration, use the following command:
+
+ ```bash
+alembic revision -m 'first migration' --autogenerate
+```
+
+To apply the migrations to your database, run:
+
+ ```bash
+alembic upgrade head
+```
+
+To connect the pgadmin4 you can use next variable:
+```
+USER='user'
+PASSWORD='password'
+DB_NAME='database'
+PORT='5431'
+HOST='localhost'
+
+```
