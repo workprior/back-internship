@@ -9,14 +9,31 @@ class Settings(BaseSettings):
     POSTGRES_DB_NAME: str
     POSTGRES_DB_PORT: str
     POSTGRES_DB_HOST: str
+    POSTGRES_DB_MAPPED_PORT: str
+    LOCALHOST: str
+
+    TEST_POSTGRES_DB_PORT: str
+    TEST_POSTGRES_DB_NAME: str
 
     REDIS_DB_PORT: str
     REDIS_DB_HOST: str
 
     @property
     def POSTGRES_DATABASE_URL(self):
-        return f"postgresql+asyncpg://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.POSTGRES_DB_HOST}:{self.POSTGRES_DB_PORT}/{self.POSTGRES_DB_NAME}"
-        # return 'postgresql+asyncpg://user:password@localhost:5431/database'
+        return f"postgresql+asyncpg://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.POSTGRES_DB_HOST}:{self.POSTGRES_DB_MAPPED_PORT}/{self.POSTGRES_DB_NAME}"
+
+    # work with container 'postgresql+asyncpg://user:password@postgres_db:5432/database'
+    # work with loc 'postgresql+asyncpg://user:password@localhost:5431/database'
+
+    @property
+    def POSTGRES_ALEMBIC_URL(self):
+        return f"postgresql+asyncpg://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.LOCALHOST}:{self.POSTGRES_DB_PORT}/{self.POSTGRES_DB_NAME}"
+        # return f"postgresql+psycopg2://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.POSTGRES_DB_HOST}:{self.POSTGRES_DB_PORT}/{self.POSTGRES_DB_NAME}"
+
+    @property
+    def POSTGRES_TEST_URL(self):
+        return f"postgresql+asyncpg://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.LOCALHOST}:{self.TEST_POSTGRES_DB_PORT}/{self.TEST_POSTGRES_DB_NAME}"
+        # return f"postgresql+psycopg2://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.POSTGRES_DB_HOST}:{self.POSTGRES_DB_PORT}/{self.POSTGRES_DB_NAME}"
 
     @property
     def REDIS_DATABASE_URL(self):
