@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     POSTGRES_DB_MAPPED_PORT: str
     LOCALHOST: str
 
+    TEST_POSTGRES_DB_PORT: str
+    TEST_POSTGRES_DB_NAME: str
+
     REDIS_DB_PORT: str
     REDIS_DB_HOST: str
 
@@ -25,6 +28,11 @@ class Settings(BaseSettings):
     @property
     def POSTGRES_ALEMBIC_URL(self):
         return f"postgresql+asyncpg://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.LOCALHOST}:{self.POSTGRES_DB_PORT}/{self.POSTGRES_DB_NAME}"
+        # return f"postgresql+psycopg2://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.POSTGRES_DB_HOST}:{self.POSTGRES_DB_PORT}/{self.POSTGRES_DB_NAME}"
+
+    @property
+    def POSTGRES_TEST_URL(self):
+        return f"postgresql+asyncpg://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.LOCALHOST}:{self.TEST_POSTGRES_DB_PORT}/{self.TEST_POSTGRES_DB_NAME}"
         # return f"postgresql+psycopg2://{self.POSTGRES_DB_USER}:{self.POSTGRES_DB_PASSWORD}@{self.POSTGRES_DB_HOST}:{self.POSTGRES_DB_PORT}/{self.POSTGRES_DB_NAME}"
 
     @property

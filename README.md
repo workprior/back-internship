@@ -52,13 +52,6 @@ uvicorn app.main:app --reload
 ```
 The web application will be available at 'http://127.0.0.1:8000'.
 
-#### 3.4 Testing
-
-To run tests, use pytest:
-```bash
-pytest
-```
-
 ### 4. Using Docker
 
 Install Docker Engine from official web-site https://docs.docker.com/engine/install/d
@@ -124,4 +117,32 @@ DB_NAME='database'
 PORT='5431'
 HOST='localhost'
 
+```
+
+### 5 Testing
+
+You need activate test database with docker-compose.
+Move to tests folder:
+```bash
+cd tests
+```
+
+Build docker container:
+```bash
+docker-compose up --build
+```
+
+Init migrations to the database:
+```bash
+alembic -c alembic_test.ini revision -m 'some text' -- autogenerate
+```
+
+Update migrations
+```bash
+alembic -c alembic_test.ini revision upgrade head
+```
+
+Run pytest!
+```bash
+pytest
 ```
