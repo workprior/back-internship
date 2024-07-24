@@ -7,10 +7,10 @@ from app.core.config import logger
 from app.db.postgres_init import get_session
 from app.db.redis_init import redis_client
 
-health_check = APIRouter()
+health_check = APIRouter(prefix="/check")
 
 
-@health_check.get("/check-postgres")
+@health_check.get("/postgres")
 async def check_db(session: AsyncSession = Depends(get_session)):
     try:
         # Execute a simple query to check the connection
@@ -31,7 +31,7 @@ async def check_db(session: AsyncSession = Depends(get_session)):
         }
 
 
-@health_check.get("/check-redis")
+@health_check.get("/redis")
 async def check_redis():
     try:
         # Ping Redis to check the connection
@@ -52,4 +52,4 @@ async def check_redis():
 
 @health_check.get("/")
 def root():
-    return {"status": 200, "details": "ok", "result": "working"}
+    return {"status": 200, "details": "ok", "result": "now work?"}
