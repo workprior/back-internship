@@ -4,18 +4,19 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
+    username: str
     email: EmailStr
     is_active: bool = True
-    firstname: str
-    lastname: str
-    city: str = None
-    phone: str = None
-    avatar: str = None
+    firstname: Optional[str] = Field(default="")
+    lastname: Optional[str] = Field(default="")
+    city: Optional[str] = Field(default="")
+    phone: Optional[str] = Field(default="")
+    avatar: Optional[str] = Field(default="")
     is_superuser: bool = False
 
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=6)
+    password: str = None
 
 
 class User(UserBase):
@@ -24,6 +25,7 @@ class User(UserBase):
 
 
 class UserUpdateRequest(BaseModel):
+    username: str
     email: EmailStr
     firstname: str
     lastname: str
@@ -32,13 +34,15 @@ class UserUpdateRequest(BaseModel):
     avatar: str = None
 
 
-class SignInRequest(BaseModel):
-    firstname: str
-    password: str
-
-
 class SignUpRequest(UserCreate):
     pass
+
+
+class UserSchema(BaseModel):
+    username: str
+    password: str
+
+    model_config = ConfigDict(strict=True)
 
 
 # class UsersListResponse(BaseModel):

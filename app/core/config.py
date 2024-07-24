@@ -1,5 +1,8 @@
 import logging
+from functools import lru_cache
+from pathlib import Path
 
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 
@@ -17,6 +20,11 @@ class Settings(BaseSettings):
 
     REDIS_DB_PORT: str
     REDIS_DB_HOST: str
+
+    AUTH0_DOMAIN: str
+    AUTH0_API_AUDIENCE: str
+    AUTH0_ISSUER: str
+    AUTH0_ALGORITHMS: str
 
     @property
     def POSTGRES_DATABASE_URL(self):
@@ -44,7 +52,16 @@ class Settings(BaseSettings):
         extra = "ignore"
 
 
+class JWTToken(BaseModel):
+    private_key_path: Path = Path("certs/jwt-private.pem")
+    public_key_path: Path = Path("certs/jwt-public.pem")
+    algorithm: str = "RS256"
+    expire_minutes: int = 30
+
+
 settings = Settings()
+
+auth_jwt: JWTToken = JWTToken()
 
 
 # Налаштування логування

@@ -1,5 +1,8 @@
 from datetime import datetime
+from typing import Annotated, Optional
 
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, SecurityScopes
 from fastapi_pagination import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -10,15 +13,19 @@ from app.core.exception import (
     UserNotFoundError,
     UserPhoneAlreadyExistsError,
 )
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, oauth2_scheme, verify_password
 from app.db.models import User
-from app.schemas.schemas import UserCreate, UserUpdateRequest
+from app.db.postgres_init import get_session
+from app.schemas.user_schemas import UserBase, UserCreate, UserSchema, UserUpdateRequest
+from app.utils.auth0 import get_auth0_decoded_token
+from app.utils.jwt_utils import decode_jwt
 
 
 async def create_user(session: AsyncSession, user: UserCreate):
     logger.info(f"Creating user with email: {user.email}")
     await check_user_exists(session, user.email, user.phone)
     db_user = User(
+        username=user.username,
         email=user.email,
         firstname=user.firstname,
         lastname=user.lastname,
@@ -61,6 +68,7 @@ async def change_user_info(session: AsyncSession, id: int, user_update: UserUpda
     db_user = result.scalars().first()
 
     if db_user:
+        db_user.username = user_update.username
         db_user.email = user_update.email
         db_user.firstname = user_update.firstname
         db_user.lastname = user_update.lastname
@@ -97,3 +105,57 @@ async def check_user_exists(session: AsyncSession, email: str = None, phone: str
         user = result.scalars().first()
         if user:
             raise UserPhoneAlreadyExistsError(phone=phone)
+
+
+# Validate Auth User
+async def validate_auth_user(user: UserSchema, session: AsyncSession = Depends(get_session)):
+    unauth = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid email or password"
+    )
+    res = await session.execute(select(User).filter(User.username == user.username))
+    db_user = res.scalars().first()
+    if db_user is None:
+        raise unauth
+    if not verify_password(user.password, db_user.hashed_password):
+        raise unauth
+
+    return db_user
+
+
+async def get_current_token_payload(
+    security_scopes: SecurityScopes,
+    token: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer()),
+):
+    try:
+        return decode_jwt(token.credentials)
+    except:
+        return get_auth0_decoded_token(security_scopes, token)
+
+
+async def get_current_user(
+    payload: Annotated[UserBase, Depends(get_current_token_payload)],
+    session: AsyncSession = Depends(get_session),
+):
+    email: str | None = payload.get("email")
+    res = await session.execute(select(User).filter(User.email == email))
+    db_user = res.scalars().first()
+    if db_user is None:
+        db_user = UserCreate(
+            username="None",
+            email=email,
+            firstname="None",
+            lastname="None",
+            city="None",
+            phone="None",
+            avatar="None",
+        )
+        db_user = await create_user(session, db_user)
+    return db_user
+
+
+async def get_current_active_user(
+    current_user: Annotated[UserBase, Depends(get_current_user)],
+):
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user

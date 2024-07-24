@@ -9,14 +9,15 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, nullable=True)  # Allow NULL for optional fields
     email = Column(String, unique=True, index=True, nullable=False)
+    firstname = Column(String, nullable=True)
+    lastname = Column(String, nullable=True)
+    city = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    avatar = Column(String, nullable=True)
+    hashed_password = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
-    firstname = Column(String, nullable=False)
-    lastname = Column(String, nullable=False)
-    city = Column(String)
-    phone = Column(String, unique=True)
-    avatar = Column(String)
-    hashed_password = Column(String, nullable=False)
     is_superuser = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

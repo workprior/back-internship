@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer
 from fastapi_pagination import add_pagination
 
 from app.core.config import logger
@@ -13,7 +14,9 @@ from app.core.exception import (
 from app.db.postgres_init import disconnect_postgres
 from app.db.redis_init import redis_client
 from app.routers.check_routers import health_check
-from app.routers.crud_routers import crud_user
+from app.routers.user_routers import crud_user
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @asynccontextmanager
@@ -30,6 +33,7 @@ async def lifespan(app: FastAPI):
 
 # FastAPI app setup
 app = FastAPI(lifespan=lifespan)
+
 
 app.include_router(health_check)
 app.include_router(crud_user)
