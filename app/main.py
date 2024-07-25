@@ -15,6 +15,7 @@ from app.core.exception import (
 from app.db.postgres_init import disconnect_postgres
 from app.db.redis_init import redis_client
 from app.routers.check_routers import health_check
+from app.routers.company_routers import company_router
 from app.routers.user_routers import crud_user
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -38,6 +39,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(health_check)
 app.include_router(crud_user)
+app.include_router(company_router)
 add_pagination(app)
 
 

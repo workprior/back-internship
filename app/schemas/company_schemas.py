@@ -7,10 +7,10 @@ class CompanyBase(BaseModel):
     name: str
     description: Optional[str] = None
     visibility: Optional[bool] = True
-    address = Optional[str] = None
-    phone = Optional[str] = None
-    email = Optional[str] = None
-    website = Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
 
 
 class CompanyCreate(CompanyBase):
@@ -18,13 +18,13 @@ class CompanyCreate(CompanyBase):
 
 
 class CompanyUpdate(BaseModel):
-    name: Optional[str] = None
+    name: str
     description: Optional[str] = None
     visibility: Optional[bool] = None
-    address = Optional[str] = None
-    phone = Optional[str] = None
-    email = Optional[str] = None
-    website = Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
 
 
 class CompanyInDB(CompanyBase):
