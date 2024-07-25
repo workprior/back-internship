@@ -8,7 +8,7 @@ Base = declarative_base()
 
 # Додано тайм-аут для підключення до PostgreSQL
 engine = create_async_engine(
-    settings.POSTGRES_ALEMBIC_URL,
+    settings.POSTGRES_DATABASE_URL,
     echo=False,
     connect_args={"timeout": 5},
 )
