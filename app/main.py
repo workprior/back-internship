@@ -7,8 +7,11 @@ from fastapi_pagination import add_pagination
 
 from app.core.config import logger
 from app.core.exception import (
+    CompanyNameAlreadyExistsError,
+    CompanyNotFoundError,
     EmailUserNotFoundError,
     UserEmailAlreadyExistsError,
+    UserNoPremissionError,
     UserNotFoundError,
     UserPhoneAlreadyExistsError,
 )
@@ -72,6 +75,17 @@ async def email_already_exists_exception_handler(
     )
 
 
+@app.exception_handler(CompanyNameAlreadyExistsError)
+async def name_already_exists_exception_handler(
+    request: Request, exc: CompanyNameAlreadyExistsError
+):
+    logger.error(f"User with email {exc.name} already exists")
+    return JSONResponse(
+        status_code=400,
+        content={"detail": f"User with email {exc.name} already exists"},
+    )
+
+
 @app.exception_handler(UserPhoneAlreadyExistsError)
 async def phone_already_exists_exception_handler(
     request: Request, exc: UserPhoneAlreadyExistsError
@@ -80,4 +94,22 @@ async def phone_already_exists_exception_handler(
     return JSONResponse(
         status_code=400,
         content={"detail": f"User with phone {exc.phone} already exists"},
+    )
+
+
+@app.exception_handler(CompanyNotFoundError)
+async def phone_already_exists_exception_handler(request: Request, exc: CompanyNotFoundError):
+    logger.error(f"Company with id {exc.id} not found")
+    return JSONResponse(
+        status_code=400,
+        content={"detail": f"Company with id {exc.id} not found"},
+    )
+
+
+@app.exception_handler(UserNoPremissionError)
+async def phone_already_exists_exception_handler(request: Request, exc: UserNoPremissionError):
+    logger.error(f"You cant update company with id {exc.id}")
+    return JSONResponse(
+        status_code=400,
+        content={"detail": f"You cant update company with id {exc.id} not found"},
     )

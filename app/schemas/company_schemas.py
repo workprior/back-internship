@@ -33,3 +33,7 @@ class CompanyInDB(CompanyBase):
 
     class Config:
         orm_mode = True
+
+
+class VisibilityUpdate(BaseModel):
+    visibility: bool
