@@ -9,6 +9,7 @@ from sqlalchemy.future import select
 
 from app.core.config import logger
 from app.core.exception import (
+    EmailUserNotFoundError,
     UserEmailAlreadyExistsError,
     UserNotFoundError,
     UserPhoneAlreadyExistsError,
@@ -16,14 +17,14 @@ from app.core.exception import (
 from app.core.security import get_password_hash, oauth2_scheme, verify_password
 from app.db.models import User
 from app.db.postgres_init import get_session
-from app.schemas.user_schemas import UserBase, UserCreate, UserSchema, UserUpdateRequest
+from app.schemas.user_schemas import UserBase, UserCreate, UserInfo, UserSchema, UserUpdateRequest
 from app.utils.auth0 import get_auth0_decoded_token
 from app.utils.jwt_utils import decode_jwt
 
 
 async def create_user(session: AsyncSession, user: UserCreate):
     logger.info(f"Creating user with email: {user.email}")
-    await check_user_exists(session, user.email, user.phone)
+    await check_user_exists(session, user.email)
     db_user = User(
         username=user.username,
         email=user.email,
@@ -34,7 +35,7 @@ async def create_user(session: AsyncSession, user: UserCreate):
         phone=user.phone,
         avatar=user.avatar,
         is_superuser=user.is_superuser,
-        hashed_password=get_password_hash(user.password),
+        hashed_password=get_password_hash(user.hashed_password),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
     )
@@ -55,6 +56,16 @@ async def get_user_by_id(session: AsyncSession, id: int):
     return db_user
 
 
+async def get_user_by_email(session: AsyncSession, email: str):
+    logger.info(f"Get user with email: {email}")
+    result = await session.execute(select(User).filter(User.email == email))
+    db_user = result.scalars().first()
+    if db_user is None:
+        raise EmailUserNotFoundError(user_id=email)
+    logger.info(f"User with ID: {email} found")
+    return db_user
+
+
 async def get_all_users(session: AsyncSession, skip: int = 0, limit: int = 10):
     logger.info(f"Get all users")
     result = await session.execute(select(User))
@@ -63,13 +74,12 @@ async def get_all_users(session: AsyncSession, skip: int = 0, limit: int = 10):
 
 async def change_user_info(session: AsyncSession, id: int, user_update: UserUpdateRequest):
     logger.info(f"Updating user with ID: {id}")
-    await check_user_exists(session, user_update.email, user_update.phone)
     result = await session.execute(select(User).filter(User.id == id))
     db_user = result.scalars().first()
 
     if db_user:
         db_user.username = user_update.username
-        db_user.email = user_update.email
+        db_user.hashed_password = get_password_hash(user_update.hashed_password)
         db_user.firstname = user_update.firstname
         db_user.lastname = user_update.lastname
         db_user.city = user_update.city
@@ -93,18 +103,12 @@ async def delete_user_from_id(session: AsyncSession, id: int):
     return {"status_code": "200", "detail": "User deleted successfully"}
 
 
-async def check_user_exists(session: AsyncSession, email: str = None, phone: str = None):
+async def check_user_exists(session: AsyncSession, email: str = None):
     if email:
         result = await session.execute(select(User).filter(User.email == email))
         user = result.scalars().first()
         if user:
             raise UserEmailAlreadyExistsError(email=email)
-
-    if phone:
-        result = await session.execute(select(User).filter(User.phone == phone))
-        user = result.scalars().first()
-        if user:
-            raise UserPhoneAlreadyExistsError(phone=phone)
 
 
 # Validate Auth User
@@ -116,7 +120,7 @@ async def validate_auth_user(user: UserSchema, session: AsyncSession = Depends(g
     db_user = res.scalars().first()
     if db_user is None:
         raise unauth
-    if not verify_password(user.password, db_user.hashed_password):
+    if not verify_password(user.hashed_password, db_user.hashed_password):
         raise unauth
 
     return db_user
@@ -133,7 +137,7 @@ async def get_current_token_payload(
 
 
 async def get_current_user(
-    payload: Annotated[UserBase, Depends(get_current_token_payload)],
+    payload: Annotated[UserInfo, Depends(get_current_token_payload)],
     session: AsyncSession = Depends(get_session),
 ):
     email: str | None = payload.get("email")
@@ -154,7 +158,7 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: Annotated[UserBase, Depends(get_current_user)],
+    current_user: Annotated[UserInfo, Depends(get_current_user)],
 ):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")

@@ -16,17 +16,17 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str = None
+    hashed_password: str = None
 
 
-class User(UserBase):
-    model_config = ConfigDict(from_attributes=True)
+class UserInfo(UserBase):
+    model_config = ConfigDict(strict=True)
     id: int
 
 
 class UserUpdateRequest(BaseModel):
     username: str
-    email: EmailStr
+    hashed_password: str
     firstname: str
     lastname: str
     city: str = None
@@ -40,7 +40,7 @@ class SignUpRequest(UserCreate):
 
 class UserSchema(BaseModel):
     username: str
-    password: str
+    hashed_password: str
 
     model_config = ConfigDict(strict=True)
 

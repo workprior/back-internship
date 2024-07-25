@@ -3,6 +3,11 @@ class UserNotFoundError(Exception):
         self.user_id = user_id
 
 
+class EmailUserNotFoundError(Exception):
+    def __init__(self, email: str):
+        self.email = email
+
+
 class UserEmailAlreadyExistsError(Exception):
     def __init__(self, email: str):
         self.email = email

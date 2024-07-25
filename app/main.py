@@ -7,6 +7,7 @@ from fastapi_pagination import add_pagination
 
 from app.core.config import logger
 from app.core.exception import (
+    EmailUserNotFoundError,
     UserEmailAlreadyExistsError,
     UserNotFoundError,
     UserPhoneAlreadyExistsError,
@@ -46,6 +47,15 @@ async def user_not_found_exception_handler(request: Request, exc: UserNotFoundEr
     return JSONResponse(
         status_code=404,
         content={"detail": f"User with id {exc.user_id} not found"},
+    )
+
+
+@app.exception_handler(EmailUserNotFoundError)
+async def email_user_not_found_exception_handler(request: Request, exc: EmailUserNotFoundError):
+    logger.error(f"User with email {exc.email} not found")
+    return JSONResponse(
+        status_code=404,
+        content={"detail": f"User with id {exc.email} not found"},
     )
 
 

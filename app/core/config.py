@@ -53,8 +53,8 @@ class Settings(BaseSettings):
 
 
 class JWTToken(BaseModel):
-    private_key_path: Path = Path("certs/jwt-private.pem")
-    public_key_path: Path = Path("certs/jwt-public.pem")
+    private_key_path: Path = Path("app/core/certs/jwt-private.pem")
+    public_key_path: Path = Path("app/core/certs/jwt-public.pem")
     algorithm: str = "RS256"
     expire_minutes: int = 30
 
