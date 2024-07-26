@@ -5,7 +5,7 @@ services:
     container_name: fastapi_app
     build: .
     volumes:
-        - ./app:/myapp
+        - ./app:/fastapi_app/app 
     ports:
       - "${EXTRA_APP_PORT}:8000"
     env_file:
